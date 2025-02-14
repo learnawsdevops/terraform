@@ -1,0 +1,71 @@
+## Best Example: `variable` vs. `local` in Terraform  
+
+### Scenario: AWS EC2 Instance with Dynamic Configurations  
+
+Imagine you're provisioning an **AWS EC2 instance** where:  
+- Users can specify **instance type** (configurable → `variable`).  
+- The **tag format** follows a predefined rule (computed → `local`).  
+
+### Terraform Code Example  
+
+```hcl
+# ✅ Variables: User-provided values
+variable "instance_type" {
+  description = "Instance type for the EC2 instance"
+  type        = string
+  default     = "t2.micro"
+}
+
+variable "environment" {
+  description = "Deployment environment"
+  type        = string
+  default     = "dev"
+}
+
+variable "project" {
+  description = "Project name"
+  type        = string
+}
+
+# ✅ Locals: Computed values within the module
+locals {
+  full_project_name = "${var.project}-${var.environment}"  # Computed dynamically
+  common_tags = {
+    Project     = var.project
+    Environment = var.environment
+    Owner       = "DevOps Team"
+  }
+}
+
+# ✅ AWS EC2 Instance using both `variable` and `local`
+resource "aws_instance" "example" {
+  ami           = "ami-09c813fb71547fc4f" # Example AMI
+  instance_type = var.instance_type       # Using user-defined variable
+
+  tags = merge(
+    local.common_tags,               # Using computed local tags
+    { Name = local.full_project_name } # Adding computed project name tag
+  )
+}
+```
+
+### Explanation  
+1. **Uses `variable` for user input:**  
+   - `instance_type`, `environment`, and `project` are **configurable per deployment**.  
+   - A user can change these values dynamically via `terraform.tfvars` or CLI.  
+
+2. **Uses `local` for computed values:**  
+   - `full_project_name` is **dynamically derived** from `project` and `environment`.  
+   - `common_tags` ensures **consistent tagging** across resources without duplication.  
+
+3. **Efficient & Readable:**  
+   - The `merge()` function **combines local and variable values** neatly.  
+   - Ensures flexibility without unnecessary repetition.  
+
+### When to Use What?  
+- **Use `variable`** when the value should be configurable per environment or deployment.  
+- **Use `local`** when the value is derived **inside the module** and doesn’t need external input.  
+
+---  
+This approach ensures **maintainability, flexibility, and best practices** when using Terraform. 🚀
+
