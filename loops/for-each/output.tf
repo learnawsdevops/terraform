@@ -1,3 +1,3 @@
-output "info"{
-    value = aws_instance.roboshop
-}
+# output "info"{
+#     value = aws_instance.roboshop
+# }

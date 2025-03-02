@@ -8,7 +8,7 @@ resource "aws_instance" "roboshop" {
     count=length(var.instance_names)
     ami = data.aws_ami.centos9_id.id
     #instance_type = var.instance_name == "mysql" || var.instance_name == "shipping" || var.instance_name == "mysql" ? "t3.small" : "t2.micro"
-    instance_type = contains(["mysql"], var.instance_names[count.index]) ? "t3.small" : "t2.micro"  # instead of having multiple expressions we can use this inbuilt containt function for better readability
+    instance_type = contains(["mysql","shipping","mongodb"], var.instance_names[count.index]) ? "t3.small" : "t2.micro"  # instead of having multiple expressions we can use this inbuilt containt function for better readability
     tags = merge(var.tags, {Name = var.instance_names[count.index]} ) 
     vpc_security_group_ids = [local.sg_id]  
 

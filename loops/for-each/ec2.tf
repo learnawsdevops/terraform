@@ -4,7 +4,7 @@
 # 2. through env variables , for windows we can set using set command 
 # 3. if above options are not used , if default mentioned in variable.tf it will fetch it else it will ask a prompt to provide in the console
 
-resource "aws_instance" "roboshop" {
+resource "aws_instance" "expense" {
     #count=length(var.instance_names)
     for_each = var.instance_names
     ami = data.aws_ami.centos9_id.id
@@ -14,8 +14,8 @@ resource "aws_instance" "roboshop" {
 
 }
 
-resource "aws_route53_record" "roboshop" {
-  for_each = aws_instance.roboshop  #o/p aws_instance.roboshop : {{},{},{}....{}} map(map)
+resource "aws_route53_record" "expense" {
+  for_each = aws_instance.expense  #o/p aws_instance.roboshop : {{},{},{}....{}} map(map)
   zone_id = var.zone_id
   name    = join(".",[each.key, var.domain_name])  #join is an inbuild funtion , it is alternative for interpolation 
   type    = "A"
@@ -23,6 +23,15 @@ resource "aws_route53_record" "roboshop" {
   records = [each.key == "web" ? each.value.public_ip :each.value.private_ip]
 
 }
+
+resource "aws_instance" "ansible" {
+    ami = data.aws_ami.centos9_id.id
+    instance_type = "t2.micro"
+    tags = merge(var.tags, {Name = "ansible"} ) 
+    vpc_security_group_ids = [local.sg_id]  
+
+}
+
 
 # major difference to use local over variable
 #------------------------------------------------

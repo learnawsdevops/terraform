@@ -14,15 +14,15 @@ variable "instance_names" {
 
   default = {
     web : "t2.micro"
-    nodejs : "t2.micro"
-    mysql : "t3.small"
+    backend : "t2.micro"
+    db : "t3.small"
   }
   
 }
 
 variable "tags" {
   default = {
-    project_name = "Roboshop"
+    project_name = "expense"
     ENV = "DEV"
     terraform = "True"
   }
